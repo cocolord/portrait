@@ -66,7 +66,8 @@ class Spider(object):
 			else:
 				cookie = {"Cookie": ""}
 			params = self._get_params(index, page)
-			if self.config.has_key('type') and self.config['type'] is 'post':
+			if self.config.has_key('type') and self.config['type'] == 'post':
+				url = self.config['base_url']
 				response = requests.post(url, data=params, cookies=cookie)
 			else:
 				url = self.config['base_url'] + params
