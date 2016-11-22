@@ -1,0 +1,14 @@
+# pycharm 配置文件
+.idea
+
+# 数据文件
+data
+
+# log文件
+log.txt
+
+# 配置文件
+*.ini
+
+# 编译文件
+*.pyc
