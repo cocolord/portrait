@@ -70,7 +70,7 @@ class HitLibrary(Spider):
 		""" 去掉重复的数据，输出json数据
 		{book: isbn	name 	classify	site	[handle]}
 		"""
-		data = read_file(self.config['dump_dir'] + '/total.txt')
+		data = read_file(self.config['dump_dir'] + '-filter/total.txt')
 		books_text = data.split('\n')
 		books = dict()
 		for book_str in books_text:
@@ -93,16 +93,14 @@ class HitLibrary(Spider):
 			if handle not in books[book_id]['record']:
 				books[book_id]['record'].append(handle)
 		text = json.dumps(books, ensure_ascii=False)
-		output(self.config['dump_dir'], 'total', text)
+		output(self.config['dump_dir'] + '-filter', 'total', text)
 	# end format_json
 
 # end class
 
 
-
-
 if __name__ == '__main__':
 	hit = HitLibrary('hit-library/config.ini')
-	# hit.get_data()
+	hit.get_data()
 	hit.extract()
 	hit.format_json()

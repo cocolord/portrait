@@ -13,11 +13,11 @@ class Note(Spider):
 
 	def _get_params(self, index, page):
 		print '\n in Note _get_params. \n'
-		params = '?g_tk=' + '1795135099' + '&res_attach=att%3D'\
+		params = '?g_tk=' + '1204247449' + '&res_attach=att%3D'\
 			+ 'offset%253D' + str(index) + '%2526%26'\
-			+ 'tl%3D' + '1472132755'+ '&format=json&list_type=msg&'\
+			+ 'tl%3D' + '1401551356'+ '&format=json&list_type=msg&'\
 			+ 'action=0&res_uin=' + str(self.config['qq']) + '&count=' + '10'\
-			+ '&sid=' + 'hDT6jTad4qEa4nNBdilWxTJsQr9KnbRA347041050201=='
+			+ '&sid=' + 'hmongATY1D8fZNn1oFrT78S321RSx7ae3fdf10201=='
 		return params
 	# end _get_params
 
@@ -50,7 +50,10 @@ class Note(Spider):
 		return output
 	# end _filter
 
+# end class
+
+
 if __name__ == '__main__':
 	note = Note('note/config.ini')
-	# note.get_data()
+	note.get_data()
 	note.extract()

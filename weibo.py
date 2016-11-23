@@ -41,7 +41,10 @@ class Weibo(Spider):
 		return output
 	# end _filter
 
+# end class
+
+
 if __name__ == '__main__':
 	weibo = Weibo('weibo/config.ini')
 	weibo.get_data()
-	# weibo.extract()
+	weibo.extract()

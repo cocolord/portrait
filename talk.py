@@ -13,18 +13,18 @@ class Talk(Spider):
 
 	def _get_params(self, index, page):
 		print '\n in Talk _get_params. \n'
-		params = '?g_tk=' + '1795135099&' \
+		params = '?g_tk=' + '1204247449&' \
 			+ 'hostuin=' + str(self.config['qq']) + '&res_type=2&'\
 			+ 'res_attach=att%3Dback%255Fserver%255Finfo%253D'\
 			+ 'offset%25253D' + str(index) + '%252526'\
 			+ 'total%25253D' + '10' + '%252526'\
-			+ 'basetime%25253D' + '1454249267' + '%252526'\
+			+ 'basetime%25253D' + '1478771121' + '%252526'\
 			+ 'feedsource%25253D' + '0' + '%2526'\
-			+ 'lastrefreshtime%253D' + '1479371528' + '%2526'\
+			+ 'lastrefreshtime%253D' + '1479901944' + '%2526'\
 			+ 'lastseparatortime%253D' + '0' + '%2526'\
 			+ 'loadcount%253D' + str(page) + '%26'\
-			+ 'tl%3D' + '1454249267' + '&refresh_type=2&format=json'\
-			+ 'sid=' + 'hDT6jTad4qEa4nNBdilWxTJsQr9KnbRA347041050201=='
+			+ 'tl%3D' + '1478771121' + '&refresh_type=2&format=json'\
+			+ 'sid=' + 'fw+hmongATY1D8fZNn1oFrT78S321RSx7ae3fdf10201=='
 		return params
 	# end _get_params
 
@@ -41,7 +41,7 @@ class Talk(Spider):
 		text = ''.join(text).lstrip('_Callback(').rstrip(');')
 		data = json.loads(text)
 		output = ""
-		if not data.has_key('data'):
+		if not data['data'].has_key('vFeeds'):
 			print '\n\t no data'
 			return ''
 		for item in data['data']['vFeeds']:
@@ -55,7 +55,10 @@ class Talk(Spider):
 		return output
 	# end _filter
 
+# end class
+
+
 if __name__ == '__main__':
 	talk = Talk('talk/config.ini')
-	# talk.get_data()
+	talk.get_data()
 	talk.extract()

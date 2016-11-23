@@ -68,10 +68,10 @@ class Spider(object):
 			params = self._get_params(index, page)
 			if self.config.has_key('type') and self.config['type'] == 'post':
 				url = self.config['base_url']
-				response = requests.post(url, data=params, cookies=cookie)
+				response = requests.post(url, data=params, headers=cookie)
 			else:
 				url = self.config['base_url'] + params
-				response = requests.get(url, cookies=cookie)
+				response = requests.get(url, headers=cookie)
 			print '\t\t status: ' + str(response.status_code)
 			if response.status_code == 200:
 				more = self._check_more(response.text)
