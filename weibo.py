@@ -2,6 +2,8 @@
 __author__ = 'qingfengsheng'
 
 import json
+import urllib
+import time
 
 from lib.spider import Spider
 
@@ -30,16 +32,35 @@ class Weibo(Spider):
 		output = ""
 		if data['cards'][0]['mod_type'] == "mod/empty":
 			print '\n\t no data'
-			return ''
+			return ' '
 		for item in data['cards'][0]['card_group']:
-			print item['mblog']['id']
 			if not item['mblog'].has_key('text'):
 				continue
 			summary = item['mblog']['text'].replace('\n', '')
-			# print summary + '\n'
+			pic_ids = item['mblog']['pic_ids']
+			if len(pic_ids) != 0:
+				self.download_img(pic_ids, item['mblog']['created_timestamp'])
 			output += summary + '\n'
 		return output
 	# end _filter
+
+	def download_img(self, pic_arr, timestamp):
+		"""
+		pic_arr: ["图片id", "图片id"]
+		timestamp: "2013-03-03 20:58"
+		"""
+		uri = "http://ww2.sinaimg.cn/large/"
+		path = self.config['dump_dir'] + '-filter/'
+		time_array = time.localtime(timestamp)
+		created_at = time.strftime("%Y-%m-%d-%H.%M.%S", time_array)
+		i = 1
+		for x in pic_arr:
+			img_url = uri + str(x) + '.jpg'
+			img_name = created_at + '-' + str(i) + '.jpg'
+			print img_name
+			urllib.urlretrieve(img_url, path + img_name)
+			i += 1
+	# end download_img
 
 # end class
 

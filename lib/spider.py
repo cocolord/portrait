@@ -97,6 +97,8 @@ class Spider(object):
 		""" 提取有效数据 """
 		print '\n\t in extract'
 		files = util.get_dir_list(self.config['dump_dir'])
+		output_path = self.config['dump_dir'] + '-filter'
+		util.check_path(output_path)
 		files.sort(key=lambda x:int(x[:-4]))
 		content = ""
 		for file in files:
@@ -105,9 +107,8 @@ class Spider(object):
 			text = f.readlines()
 			f.close()
 			print path
-			# self._filter(text)
 			content += self._filter(text)
-		util.output(self.config['dump_dir'] + '-filter', 'total', content)
+		util.output(output_path, 'total', content)
 	# end extract
 
 
