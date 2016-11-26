@@ -25,6 +25,7 @@ class Spider(object):
 			print '\n\t no file ' + path
 			return
 		self.config = util.init(path)
+		self.config['requests_dir'] = self.config['dump_dir'] + '/requests'
 		print self.config
 		util.check_path(self.config['dump_dir'])
 	# end __init__
@@ -74,14 +75,13 @@ class Spider(object):
 				response = requests.get(url, headers=cookie)
 			print '\t\t status: ' + str(response.status_code)
 			if response.status_code == 200:
+				util.output(self.config['requests_dir'], page, response.text)
 				more = self._check_more(response.text)
 				print '\t\t\t has_more: ' + str(more)
-				util.output(self.config['dump_dir'], page, response.text)
-				if more is False:
-					if fail < 10:
-						print '\n\tfail: ' + str(fail) + '\ttry again'
-						more = True
-						fail += 1
+				if more is False and fail < 10:
+					print '\n\tfail: ' + str(fail) + '\ttry again'
+					more = True
+					fail += 1
 				else:
 					page += 1
 					index += 10
@@ -111,6 +111,50 @@ class Spider(object):
 		util.output(output_path, 'total', content)
 	# end extract
 
+##############################################################################
+##############################################################################
+##############################################################################
+
+	def _before_loop_file_v1(self):
+		pass
+	# end _before_loop_file_v1
+
+	def _get_loop_data_v1(self, text):
+		pass
+	# end _get_loop_data_v1
+
+	def _loop_item_v1(self, item):
+		pass
+	# end _loop_item_v1
+
+	def _after_loop_file_v1(self):
+		pass
+	# end _after_loop_file_v1
+
+	def extract_v1(self):
+		""" extract 升级第一版 """
+		print '\n in extract_v1 \n'
+		files = util.get_dir_list(self.config['requests_dir'])
+		if len(files) < 1:
+			return
+		files.sort(key=lambda x:int(x[:-4]))
+		self._before_loop_file_v1()
+		for file in files:
+			print '\n' + file + '\n'
+			f = open(self.config['requests_dir'] + '/' + file)
+			text = f.readlines()
+			f.close()
+			del f
+			data = self._get_loop_data_v1(text)
+			del text
+			if len(data) < 1:
+				continue
+			for item in data:
+				self._loop_item_v1(item)
+			# end for item
+		self._after_loop_file_v1()
+		# end for file
+	# end extract_v1
 
 # end Spider
 
