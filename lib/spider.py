@@ -59,37 +59,41 @@ class Spider(object):
 		index = 0 		# 已经加载的数据个数
 		page = 1 		# 请求次数
 		more = True 	# 循环条件，初始为 True
+		header = {
+			'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 9_1 like Mac OS X) AppleWebKit/601.1.46 (KHTML, like Gecko) Version/9.0 Mobile/13B143 Safari/601.1'
+		}
+		if not self.config.has_key('cookie'):
+			self.config['cookie'] = ""
+		header['Cookie'] = self.config['cookie']
 
 		while more:
 			print '\n no.' + str(page)
-			if self.config.has_key('cookie'):
-				cookie = {"Cookie": self.config['cookie']}
-			else:
-				cookie = {"Cookie": ""}
 			params = self._get_params(index, page)
 			if self.config.has_key('type') and self.config['type'] == 'post':
 				url = self.config['base_url']
-				response = requests.post(url, data=params, headers=cookie)
+				response = requests.post(url, data=params, headers=header)
 			else:
 				url = self.config['base_url'] + params
-				response = requests.get(url, headers=cookie)
+				response = requests.get(url, headers=header)
 			print '\t\t status: ' + str(response.status_code)
+			print response.headers
 			if response.status_code == 200:
 				util.output(self.config['requests_dir'], page, response.text)
 				more = self._check_more(response.text)
 				print '\t\t\t has_more: ' + str(more)
 				if more is False and fail < 10:
-					print '\n\tfail: ' + str(fail) + '\ttry again'
 					more = True
 					fail += 1
+					print '\n\tfail: ' + str(fail) + '\ttry again'
 				else:
+					fail = 0
 					page += 1
 					index += 10
 			else:
-				print '\n\t\t something wrong\n\n'
 				if fail > 10:
 					break
 				fail += 1
+				print '\n\t\t something wrong, fail ' + str(fail) + '\n\n'
 			print '\n'
 	# end get_data
 
