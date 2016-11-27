@@ -76,7 +76,6 @@ class Spider(object):
 				url = self.config['base_url'] + params
 				response = requests.get(url, headers=header)
 			print '\t\t status: ' + str(response.status_code)
-			print response.headers
 			if response.status_code == 200:
 				util.output(self.config['requests_dir'], page, response.text)
 				more = self._check_more(response.text)
@@ -100,13 +99,13 @@ class Spider(object):
 	def extract(self):
 		""" 提取有效数据 """
 		print '\n\t in extract'
-		files = util.get_dir_list(self.config['dump_dir'])
-		output_path = self.config['dump_dir'] + '-filter'
+		files = util.get_dir_list(self.config['requests_dir'])
+		output_path = self.config['dump_dir']
 		util.check_path(output_path)
 		files.sort(key=lambda x:int(x[:-4]))
 		content = ""
 		for file in files:
-			path = self.config['dump_dir'] + '/' + file
+			path = self.config['requests_dir'] + '/' + file
 			f = open(path)
 			text = f.readlines()
 			f.close()

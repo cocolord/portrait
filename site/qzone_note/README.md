@@ -7,7 +7,7 @@
 ```
 {
   "qq": 100001,
-  "dump_dir": "talk/data/",
+  "dump_dir": "data/test",
   "base_url": "https://mobile.qzone.qq.com/get_feeds",
   "cookie": ""
 }

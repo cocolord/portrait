@@ -162,6 +162,6 @@ class Weibo(Spider):
 
 
 if __name__ == '__main__':
-	weibo = Weibo('weibo/config.ini')
-	# weibo.get_data()
+	weibo = Weibo('config.ini')
+	weibo.get_data()
 	weibo.extract_v1()

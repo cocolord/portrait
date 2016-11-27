@@ -5,26 +5,26 @@ import json
 
 from lib.spider import Spider
 
-class Talk(Spider):
+class QzoneTalk(Spider):
 	def __init__(self, path):
-		super(Talk, self).__init__(path)
-		print '\n in Talk __init__'
+		super(QzoneTalk, self).__init__(path)
+		print '\n in QzoneTalk __init__'
 	# end __init__
 
 	def _get_params(self, index, page):
-		print '\n in Talk _get_params. \n'
-		params = '?g_tk=' + '1204247449&' \
+		print '\n in QzoneTalk _get_params. \n'
+		params = '?g_tk=' + '1013386782&' \
 			+ 'hostuin=' + str(self.config['qq']) + '&res_type=2&'\
 			+ 'res_attach=att%3Dback%255Fserver%255Finfo%253D'\
 			+ 'offset%25253D' + str(index) + '%252526'\
 			+ 'total%25253D' + '10' + '%252526'\
-			+ 'basetime%25253D' + '1478771121' + '%252526'\
+			+ 'basetime%25253D' + '1478769653' + '%252526'\
 			+ 'feedsource%25253D' + '0' + '%2526'\
 			+ 'lastrefreshtime%253D' + '1479901944' + '%2526'\
 			+ 'lastseparatortime%253D' + '0' + '%2526'\
 			+ 'loadcount%253D' + str(page) + '%26'\
-			+ 'tl%3D' + '1478771121' + '&refresh_type=2&format=json'\
-			+ 'sid=' + 'fw+hmongATY1D8fZNn1oFrT78S321RSx7ae3fdf10201=='
+			+ 'tl%3D' + '1478769653' + '&refresh_type=2&format=json'\
+			+ 'sid=' + 'fw+1hiSDMLklIO7Q463NP55FrT78S321RSx7ae3fdf10201=='
 		return params
 	# end _get_params
 
@@ -50,7 +50,6 @@ class Talk(Spider):
 			if not item.has_key('summary'):
 				continue
 			summary = item['summary']['summary'].replace('\n', '')
-			# print summary + '\n'
 			output += summary + '\n'
 		return output
 	# end _filter
@@ -59,6 +58,6 @@ class Talk(Spider):
 
 
 if __name__ == '__main__':
-	talk = Talk('talk/config.ini')
-	talk.get_data()
-	talk.extract()
+	QzoneTalk = QzoneTalk('config.ini')
+	QzoneTalk.get_data()
+	QzoneTalk.extract()

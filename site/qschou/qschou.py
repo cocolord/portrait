@@ -19,7 +19,6 @@ class Qschou(Spider):
 			self.r_id = ""
 		return "?timestamp=" + str(self.r_timestamp)\
 			+ "&_=" + str(self.r_id)
-		pass
 	# end _get_params
 
 	def _check_more(self, text):
@@ -48,12 +47,9 @@ class Qschou(Spider):
 			date_array = time.strftime("%Y-%m-%d %H:%M:%S", time_array).split(' ')
 			r_date = date_array[0]
 			r_time = date_array[1]
-
 			item_string = r_date + '\t' + r_time + '\t' + str(item['id']) + '\t' \
 					 + item['title'][1]['text'] + '\n'
-
 			print item_string
-
 			output += item_string
 		return output
 	# end _filter
@@ -62,6 +58,6 @@ class Qschou(Spider):
 
 
 if __name__ == '__main__':
-	qschou = Qschou('qschou/config.ini')
+	qschou = Qschou('config.ini')
 	qschou.get_data()
 	qschou.extract()

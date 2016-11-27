@@ -6,7 +6,7 @@
 ```
 {
     "base_url": "http://support.qschou.com/new/support/9225-4595-9182",
-    "dump_dir": "qschou/data/test"
+    "dump_dir": "data/test"
 }
 ```
 

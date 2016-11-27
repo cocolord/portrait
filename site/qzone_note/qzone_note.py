@@ -5,19 +5,19 @@ import json
 
 from lib.spider import Spider
 
-class Note(Spider):
+class QzoneNote(Spider):
 	def __init__(self, path):
-		super(Note, self).__init__(path)
-		print '\n in Note __init__'
+		super(QzoneNote, self).__init__(path)
+		print '\n in QzoneNote __init__'
 	# end __init__
 
 	def _get_params(self, index, page):
-		print '\n in Note _get_params. \n'
-		params = '?g_tk=' + '1204247449' + '&res_attach=att%3D'\
+		print '\n in QzoneNote _get_params. \n'
+		params = '?g_tk=' + '1013386782' + '&res_attach=att%3D'\
 			+ 'offset%253D' + str(index) + '%2526%26'\
 			+ 'tl%3D' + '1401551356'+ '&format=json&list_type=msg&'\
 			+ 'action=0&res_uin=' + str(self.config['qq']) + '&count=' + '10'\
-			+ '&sid=' + 'hmongATY1D8fZNn1oFrT78S321RSx7ae3fdf10201=='
+			+ '&sid=' + '1hiSDMLklIO7Q463NP55FrT78S321RSx7ae3fdf10201=='
 		return params
 	# end _get_params
 
@@ -54,6 +54,6 @@ class Note(Spider):
 
 
 if __name__ == '__main__':
-	note = Note('note/config.ini')
-	note.get_data()
-	note.extract()
+	QzoneNote = QzoneNote('config.ini')
+	QzoneNote.get_data()
+	QzoneNote.extract()
