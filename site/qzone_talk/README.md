@@ -18,6 +18,10 @@
 - base_url：数据接口，无需调整
 - cookie：使用chrome登录空间，自行复制粘贴
 
+修改请求url
+```
+https://mobile.qzone.qq.com/list
+```
 
 ## response 分析
 
