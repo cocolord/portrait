@@ -6,8 +6,6 @@ import urllib
 import time
 import re
 
-from prettytable import PrettyTable as pt
-
 from lib.spider import Spider
 from lib.util import *
 
@@ -48,10 +46,6 @@ class Weibo(Spider):
 			urllib.urlretrieve(img_url, path + img_name)
 			i += 1
 	# end download_img
-
-##############################################################################
-##############################################################################
-##############################################################################
 
 	def _before_loop_file_v1(self):
 		self.process = dict()
@@ -156,7 +150,12 @@ class Weibo(Spider):
 			print img_name
 			urllib.urlretrieve(img_url, path + img_name)
 			i += 1
-	# end download_img
+	# end download_img_v1
+
+	def data_clean(self):
+		# 去掉html标签，提取：@
+		# 表情统一处理：[]
+		# 标签不需要关注，已从结构化数据中提取
 
 # end class
 
