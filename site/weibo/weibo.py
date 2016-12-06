@@ -13,8 +13,8 @@ class Weibo(Spider):
 	def __init__(self, path):
 		super(Weibo, self).__init__(path)
 		print '\n in Weibo __init__'
-		self.config['base_url'] = "http://m.weibo.cn/page/json?containerid=100505"\
-			+ str(self.config['uid']) + "_-_WEIBO_SECOND_PROFILE_WEIBO&page="
+		# self.config['base_url'] = "http://m.weibo.cn/page/json?containerid=100505"\
+			# + str(self.config['uid']) + "_-_WEIBO_SECOND_PROFILE_WEIBO&page="
 	# end __init__
 
 	def _get_params(self, index, page):
@@ -156,6 +156,7 @@ class Weibo(Spider):
 		# 去掉html标签，提取：@
 		# 表情统一处理：[]
 		# 标签不需要关注，已从结构化数据中提取
+		pass
 
 # end class
 
@@ -163,4 +164,4 @@ class Weibo(Spider):
 if __name__ == '__main__':
 	weibo = Weibo('config.ini')
 	weibo.get_data()
-	weibo.extract_v1()
+	# weibo.extract_v1()
