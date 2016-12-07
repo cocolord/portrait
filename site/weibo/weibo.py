@@ -156,7 +156,7 @@ class Weibo(Spider):
 		# 去掉html标签，提取：@
 		# 表情统一处理：[]
 		# 标签不需要关注，已从结构化数据中提取
-
+		pass
 # end class
 
 
