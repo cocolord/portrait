@@ -3,6 +3,7 @@ __author__ = 'qingfengsheng'
 
 import requests
 import thread
+import threading
 import time
 import math
 import random
@@ -29,7 +30,7 @@ class Spider(object):
 			print '\n\t no file ' + path
 			return
 		self.config = util.init(path)
-		self.config['ua'] = util.init('../config/user-agent.json')
+		self.config['ua'] = util.init(self.config['ua'])
 		self.config['requests_dir'] = self.config['dump_dir'] + '/requests'
 		print self.config
 		util.check_path(self.config['dump_dir'])
@@ -140,11 +141,13 @@ class Spider(object):
 
 	def _get_header_v1(self):
 		""" 随机分配一个请求头，主要是 UA 和 Cookie """
-		key = math.floor(random.random()*33)
-		header = self.config['ua'][key]
+		key = int(math.floor(random.random()*33))
 		if not self.config.has_key('cookie'):
 			self.config['cookie'] = ""
-		header['Cookie'] = self.config['cookie']
+		header = {
+			'User-Agent': self.config['ua'][key],
+			'Cookie': self.config['cookie']
+		}
 		return header
 	# end
 
@@ -161,7 +164,7 @@ class Spider(object):
 		while more:
 			print '\n no.' + str(index)
 			params = self._get_params_v1(index)
-			response = self.simple_request_v1(params)
+			response = self.simple_request_v1(url, header, params)
 			print '\t\t status: ' + str(response.status_code)
 			if response.status_code == 200:
 				util.output(self.config['requests_dir'], index, response.text)
@@ -196,8 +199,9 @@ class Spider(object):
 		print '\n\n\t\t done!!! \n\n'
 	# end
 
-	def simple_request_v1(self, params):
+	def simple_request_v1(self, url, header, params):
 		""" 发送一个请求 """
+		print params
 		if self.config.has_key('type') and self.config['type'] == 'post':
 			response = requests.post(url, data=params, headers=header)
 		else:
@@ -206,26 +210,26 @@ class Spider(object):
 	# end
 
 	def get_data_v1(self):
-		""" 得到总页数，开10个线程请求
-		"""
+		""" 得到总页数，开10个线程请求 """
 		total = self._get_total_page_v1()
-		part = math.floor(total/10)
+		part = int(math.floor(total/10))
 		if part < 1:
 			return
 		try:
-			thread.start_new_thread(self._get_data_thread, (0, part))
-			thread.start_new_thread(self._get_data_thread, (1*part+1, 2*part))
-			thread.start_new_thread(self._get_data_thread, (2*part+1, 3*part))
-			thread.start_new_thread(self._get_data_thread, (3*part+1, 4*part))
-			thread.start_new_thread(self._get_data_thread, (4*part+1, 5*part))
-			thread.start_new_thread(self._get_data_thread, (5*part+1, 6*part))
-			thread.start_new_thread(self._get_data_thread, (6*part+1, 7*part))
-			thread.start_new_thread(self._get_data_thread, (7*part+1, 8*part))
-			thread.start_new_thread(self._get_data_thread, (8*part+1, 9*part))
-			thread.start_new_thread(self._get_data_thread, (9*part+1, total))
+			callback = self._get_data_thread
+			thread_list = list()
+			for x in range(0,10):
+				arguments = (x*part+1, (x+1)*part)
+				if x == 9:
+					arguments = (x*part+1, total)
+				item = threading.Thread(target=callback, args=arguments)
+				thread_list.append(item)
 		except Exception as e:
 			print "Error: unable to start thread"
 			raise
+		print 'start thread'
+		for item in thread_list:
+			item.start()
 	# end
 
 	def _before_loop_file_v1(self):

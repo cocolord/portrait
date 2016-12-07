@@ -21,7 +21,6 @@ def read_file(path):
 	""" 读取文件 """
 	if not os.path.isfile(path):
 		raise UserWarning("file donot exist")
-		return False
 	file = open(path, 'r')
 	text = file.read()
 	file.close()
