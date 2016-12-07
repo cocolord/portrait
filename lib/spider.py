@@ -157,9 +157,7 @@ class Spider(object):
 		header = self._get_header_v1()
 
 		more = True
-		fail = 0
-		forbidden = 0
-		reset = 0
+		fail = forbidden = reset = error414 = 0
 
 		while more:
 			print '\n no.' + str(index)
@@ -173,25 +171,22 @@ class Spider(object):
 				if more is False and fail < 10:
 					more = True
 					fail += 1
-					print '\n\tfail: ' + str(fail) + '\ttry again'
 				else:
-					fail = 0
+					fail = forbidden = error414 = 0
 					index += 1
-					if index > end:
-						more = False
+					if index > end : break
 			elif response.status_code == 403:
 				forbidden += 1
-				print '\n\t\t forbidden: ' + str(forbidden) + '\n\n'
-				time.sleep(forbidden*10)
 				if forbidden > 10:
 					header = self._get_header_v1()
 					forbidden = 0
 					reset += 1
-				if reset > 10:
-					more = False
+				if reset > 10 : break
+			elif response.status_code == 414:
+				error414 += 1
+				if error414 > 10 : break
 			else:
-				if fail > 10:
-					break
+				if fail > 10 : break
 				fail += 1
 				print '\n\t\t something wrong, fail ' + str(fail) + '\n\n'
 			# end if-elif-else
@@ -209,16 +204,16 @@ class Spider(object):
 		return response
 	# end
 
-	def get_data_v1(self):
+	def get_data_v1(self, worker=10):
 		""" 得到总页数，开10个线程请求 """
 		total = self._get_total_page_v1()
-		part = int(math.floor(total/10))
+		part = int(math.floor(total/worker))
 		if part < 1:
 			return
 		try:
 			callback = self._get_data_thread
 			thread_list = list()
-			for x in range(0,10):
+			for x in range(0,worker):
 				arguments = (x*part+1, (x+1)*part)
 				if x == 9:
 					arguments = (x*part+1, total)

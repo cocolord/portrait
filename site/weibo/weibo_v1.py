@@ -22,6 +22,8 @@ class WeiboV1(Spider):
 		""" 得到需要请求的总次数 """
 		if self.config['type'] == "weibo":
 			pages = self.get_total_weibo()
+		elif self.config['type'] == "weibo-wap":
+			pages = self.get_total_weibo_wap()
 		return pages
 	# end
 
@@ -29,6 +31,8 @@ class WeiboV1(Spider):
 		""" 在发送请求前做一些处理 主要是为了获取参数/数据 """
 		if self.config['type'] == "weibo":
 			params = self.get_params_weibo(page)
+		elif self.config['type'] == "weibo-wap":
+			params = self.get_params_weibo_wap(page)
 		return params
 	# end
 
@@ -36,13 +40,15 @@ class WeiboV1(Spider):
 		""" 在请求成功返回后做一些处理 主要是为了检查是否还有更多 """
 		if self.config['type'] == "weibo":
 			more = self.check_more_weibo(text)
+		elif self.config['type'] == "weibo-wap":
+			more = self.check_more_weibo_wap(text)
 		return more
 	# end
 
 
-########################################
-# 			用户全部微博			   #
-########################################
+	########################################
+	# 			用户全部微博			   #
+	########################################
 
 	def before_get_all_weibo(self):
 		self.config['containerid'] =  "100505" + str(self.config['uid']) \
@@ -54,10 +60,10 @@ class WeiboV1(Spider):
 		header = self._get_header_v1()
 		response = self.simple_request_v1(url, header, self.get_params_weibo(1))
 		try:
-			print response.text
 			data = json.loads(response.text)
 		except Exception as e:
 			print "Tip: please check cookie"
+			print response.text
 			raise
 		print data['cards'][0]['maxPage']
 		return data['cards'][0]['maxPage']
@@ -78,9 +84,24 @@ class WeiboV1(Spider):
 			return True
 	# end
 
+	########################################
+	#   	wap 版用户全部微博			   #
+	########################################
+
+	def get_total_weibo_wap(self):
+		return 6835
+
+	def get_params_weibo_wap(self, page):
+		return {
+			'page': page
+		}
+
+	def check_more_weibo_wap(self, text):
+		return True
+
 # end
 
 
 if __name__ == '__main__':
 	weibov1 = WeiboV1('config-v1.ini')
-	weibov1.get_data_v1()
+	weibov1.get_data_v1(worker=20)
