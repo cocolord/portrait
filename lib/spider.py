@@ -2,6 +2,11 @@
 __author__ = 'qingfengsheng'
 
 import requests
+import thread
+import threading
+import time
+import math
+import random
 
 import util
 
@@ -25,6 +30,8 @@ class Spider(object):
 			print '\n\t no file ' + path
 			return
 		self.config = util.init(path)
+		if self.config.has_key('ua'):
+			self.config['ua'] = util.init(self.config['ua'])
 		self.config['requests_dir'] = self.config['dump_dir'] + '/requests'
 		print self.config
 		util.check_path(self.config['dump_dir'])
@@ -117,6 +124,109 @@ class Spider(object):
 ##############################################################################
 ##############################################################################
 ##############################################################################
+
+	def _get_total_page_v1(self):
+		""" 得到需要请求的总次数 """
+		pass
+	# end
+
+	def _get_params_v1(self, page):
+		""" 在发送请求前做一些处理 主要是为了获取参数/数据 """
+		pass
+	# end
+
+	def _check_more_v1(self, text):
+		""" 在请求成功返回后做一些处理 主要是为了检查是否还有更多 """
+		pass
+	# end
+
+	def _get_header_v1(self):
+		""" 随机分配一个请求头，主要是 UA 和 Cookie """
+		key = int(math.floor(random.random()*33))
+		if not self.config.has_key('cookie'):
+			self.config['cookie'] = ""
+		header = {
+			'User-Agent': self.config['ua'][key],
+			'Cookie': self.config['cookie']
+		}
+		return header
+	# end
+
+	def _get_data_thread(self, index=0, end=0):
+		""" 线程处理 """
+		url = self.config['base_url']
+		header = self._get_header_v1()
+
+		more = True
+		fail = forbidden = reset = error414 = 0
+
+		while more:
+			print '\n no.' + str(index)
+			params = self._get_params_v1(index)
+			response = self.simple_request_v1(url, header, params)
+			print '\t\t status: ' + str(response.status_code)
+			if response.status_code == 200:
+				util.output(self.config['requests_dir'], index, response.text)
+				more = self._check_more_v1(response.text)
+				print '\t\t\t has_more: ' + str(more)
+				if more is False and fail < 10:
+					more = True
+					fail += 1
+				else:
+					fail = forbidden = error414 = 0
+					index += 1
+					if index > end : break
+			elif response.status_code == 403:
+				forbidden += 1
+				if forbidden > 10:
+					header = self._get_header_v1()
+					forbidden = 0
+					reset += 1
+				if reset > 10 : break
+			elif response.status_code == 414:
+				error414 += 1
+				if error414 > 10 : break
+			else:
+				if fail > 10 : break
+				fail += 1
+				print '\n\t\t something wrong, fail ' + str(fail) + '\n\n'
+			# end if-elif-else
+		# end while
+		print '\n\n\t\t done!!! \n\n'
+	# end
+
+	def simple_request_v1(self, url, header, params):
+		""" 发送一个请求 """
+		print params
+		if self.config.has_key('type') and self.config['type'] == 'post':
+			response = requests.post(url, data=params, headers=header)
+		else:
+			response = requests.get(url, params=params, headers=header)
+		return response
+	# end
+
+	def get_data_v1(self, worker=10):
+		""" 得到总页数，开10个线程请求 """
+		total = self._get_total_page_v1()
+		part = int(math.floor(total/worker))
+		if part < 1:
+			return
+		try:
+			callback = self._get_data_thread
+			thread_list = list()
+			for x in range(0,worker):
+				arguments = (x*part+1, (x+1)*part)
+				if x == 9:
+					arguments = (x*part+1, total)
+				item = threading.Thread(target=callback, args=arguments)
+				thread_list.append(item)
+		except Exception as e:
+			print "Error: unable to start thread"
+			raise
+		print 'start thread'
+		for item in thread_list:
+			item.start()
+	# end
 
 	def _before_loop_file_v1(self):
 		pass
