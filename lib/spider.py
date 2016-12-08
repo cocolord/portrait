@@ -30,7 +30,8 @@ class Spider(object):
 			print '\n\t no file ' + path
 			return
 		self.config = util.init(path)
-		self.config['ua'] = util.init(self.config['ua'])
+		if self.config.has_key('ua'):
+			self.config['ua'] = util.init(self.config['ua'])
 		self.config['requests_dir'] = self.config['dump_dir'] + '/requests'
 		print self.config
 		util.check_path(self.config['dump_dir'])

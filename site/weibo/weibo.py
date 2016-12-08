@@ -13,8 +13,8 @@ class Weibo(Spider):
 	def __init__(self, path):
 		super(Weibo, self).__init__(path)
 		print '\n in Weibo __init__'
-		# self.config['base_url'] = "http://m.weibo.cn/page/json?containerid=100505"\
-			# + str(self.config['uid']) + "_-_WEIBO_SECOND_PROFILE_WEIBO&page="
+		self.config['base_url'] = "http://m.weibo.cn/page/json?containerid=100505"\
+			+ str(self.config['uid']) + "_-_WEIBO_SECOND_PROFILE_WEIBO&page="
 	# end __init__
 
 	def _get_params(self, index, page):
@@ -72,12 +72,12 @@ class Weibo(Spider):
 			# 还有表情、@、转发 需要处理
 			self.content += item['text'] + '\n'
 
-		# # 图片
-		# if len(item['pic_ids']) > 0:
-		# 	self.process['imgs'].append({
-		# 		'time': item['created_timestamp'],
-		# 		'id_list': item['pic_ids']
-		# 	})
+		# 图片
+		if len(item['pic_ids']) > 0:
+			self.process['imgs'].append({
+				'time': item['created_timestamp'],
+				'id_list': item['pic_ids']
+			})
 
 		# 定位、外链
 		if item.has_key('url_struct') and len(item['url_struct']) > 0:
@@ -128,6 +128,7 @@ class Weibo(Spider):
 		output_v1(root_path, 'content.txt', self.content)
 		output_v1(root_path, 'url.json', self.process['url'])
 		output_v1(root_path, 'topic.json', self.process['topic'])
+		output_v1(root_path, 'imgs.json', self.process['imgs'])
 		# for x in self.process['imgs']:
 		# 	self.download_img_v1(x['id_list'], x['time'])
 		print '\n\n\t\t done!!! \n\n'
@@ -143,13 +144,11 @@ class Weibo(Spider):
 		check_path(path)
 		time_array = time.localtime(timestamp)
 		created_at = time.strftime("%Y-%m-%d-%H.%M.%S", time_array)
-		i = 1
 		for x in pic_list:
 			img_url = uri + str(x) + '.jpg'
-			img_name = created_at + '-' + str(i) + '.jpg'
+			img_name = created_at + '-' + str(x) + '.jpg'
 			print img_name
 			urllib.urlretrieve(img_url, path + img_name)
-			i += 1
 	# end download_img_v1
 
 	def data_clean(self):
@@ -163,5 +162,9 @@ class Weibo(Spider):
 
 if __name__ == '__main__':
 	weibo = Weibo('config.ini')
-	weibo.get_data()
+	# weibo.get_data()
 	# weibo.extract_v1()
+	imgs_list = init( weibo.config['dump_dir']  + '/imgs.json')
+	for x in imgs_list:
+			weibo.download_img_v1(x['id_list'], x['time'])
+

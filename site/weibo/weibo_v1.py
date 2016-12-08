@@ -5,6 +5,7 @@ import json
 import urllib
 import time
 import re
+from pyquery import PyQuery as pq
 
 from lib.spider import Spider
 from lib.util import *
@@ -89,7 +90,12 @@ class WeiboV1(Spider):
 	########################################
 
 	def get_total_weibo_wap(self):
-		return 6835
+		# document.querySelector('input[name="mp"]').value
+		url = self.config['base_url']
+		header = self._get_header_v1()
+		response = self.simple_request_v1(url, header, self.get_params_weibo(1))
+
+		# return 6835
 
 	def get_params_weibo_wap(self, page):
 		return {
@@ -97,6 +103,7 @@ class WeiboV1(Spider):
 		}
 
 	def check_more_weibo_wap(self, text):
+		""" wap 版一开始就确定了总页数 """
 		return True
 
 # end
