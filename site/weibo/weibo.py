@@ -3,11 +3,9 @@ __author__ = 'qingfengsheng'
 
 import json
 import urllib
+import requests
 import time
 import re
-import socket
-socket.setdefaulttimeout(30)
-import os
 
 from lib.spider import Spider
 from lib.util import *
@@ -143,16 +141,24 @@ class Weibo(Spider):
 		"""
 		path = self.config['dump_dir'] + '/img/'
 		check_path(path)
+		headers = self._get_header_v1()
 		for x in pic_list:
 			time_array = time.localtime(x['time'])
 			created_at = time.strftime("%Y-%m-%d-%H.%M.%S", time_array)
 			img_name = path + created_at + '.jpg'
-			print x, img_name
-			jpgsize = 0
-			while (jpgsize == 0):
-				urllib.urlretrieve(x['url'], img_name)
-				jpgsize = os.path.getsize(img_name)
-			print jpgsize
+			download = False
+			while download is False:
+				response = requests.get(x['url'], headers=headers)
+				code = response.status_code
+				if code == 200:
+					data = response.content
+					f = file(img_name, "wb")
+					f.write(data)
+					f.close()
+					download = True
+				elif code == 403:
+					print "forbidden"
+					headers = self._get_header_v1()
 	# end
 
 	def data_clean(self):
@@ -167,10 +173,9 @@ class Weibo(Spider):
 
 if __name__ == '__main__':
 	weibo = Weibo('config.ini')
-	# weibo.get_data()
-	# weibo.extract_v1()
+	weibo.get_data()
+	weibo.extract_v1()
 	imgs_list = init(weibo.config['dump_dir']  + '/imgs.json')
-	print imgs_list
 	weibo.download_img_v1(imgs_list)
 	print '\n\n\t\t done!!! \n\n'
 
