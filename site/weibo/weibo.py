@@ -5,6 +5,9 @@ import json
 import urllib
 import time
 import re
+import socket
+socket.setdefaulttimeout(30)
+import os
 
 from lib.spider import Spider
 from lib.util import *
@@ -15,19 +18,19 @@ class Weibo(Spider):
 		print '\n in Weibo __init__'
 		self.config['base_url'] = "http://m.weibo.cn/page/json?containerid=100505"\
 			+ str(self.config['uid']) + "_-_WEIBO_SECOND_PROFILE_WEIBO&page="
-	# end __init__
+	# end
 
 	def _get_params(self, index, page):
 		print '\n in Weibo _get_params. \n'
 		return str(page)
-	# end _get_params
+	# end
 
 	def _check_more(self, text):
 		if text.find('{"mod_type":"mod\/empty"') > 0:
 			return False
 		else:
 			return True
-	# end _check_more
+	# end
 
 	def download_img(self, pic_arr, timestamp):
 		"""
@@ -45,7 +48,7 @@ class Weibo(Spider):
 			print img_name
 			urllib.urlretrieve(img_url, path + img_name)
 			i += 1
-	# end download_img
+	# end
 
 	def _before_loop_file_v1(self):
 		self.process = dict()
@@ -54,7 +57,7 @@ class Weibo(Spider):
 		self.process['imgs'] = list()
 		self.wbs_info = list()
 		self.content = ""
-	# end _before_loop_file_v1
+	# end
 
 	def _get_loop_data_v1(self, text):
 		data = json.loads(''.join(text))
@@ -62,46 +65,47 @@ class Weibo(Spider):
 			print '\n\t no data'
 			return []
 		return data['cards'][0]['card_group']
-	# end _get_loop_data_v1
+	# end
 
 	def _loop_item_v1(self, item):
 		""" 循环每一条微博 """
 		item = item['mblog']
 		# 正文
-		if item.has_key('text'):
+		if 'text' in item:
 			# 还有表情、@、转发 需要处理
 			self.content += item['text'] + '\n'
 
 		# 图片
-		if len(item['pic_ids']) > 0:
-			self.process['imgs'].append({
-				'time': item['created_timestamp'],
-				'id_list': item['pic_ids']
-			})
+		if 'pics' in item and len(item['pics']) > 0:
+			for pic in item['pics']:
+				self.process['imgs'].append({
+					'time': item['created_timestamp'],
+					'url': re.sub(r'sinaimg\.cn\/(.+?)\/', 'sinaimg.cn/large/', pic['url'])
+				})
 
 		# 定位、外链
-		if item.has_key('url_struct') and len(item['url_struct']) > 0:
+		if 'url_struct' in item and len(item['url_struct']) > 0:
 			for loc in item['url_struct']:
 				url_type = re.findall(r'card_(.+?).png$', loc['url_type_pic'])
 				if len(url_type) == 0:
 					continue
 				url_type = url_type[0]
-				if not self.process['url'].has_key(url_type):
+				if url_type not in self.process['url']:
 					self.process['url'][url_type] = dict()
-				if not self.process['url'][url_type].has_key(loc['url_title']):
+				if loc['url_title'] not in self.process['url'][url_type]:
 					self.process['url'][url_type][loc['url_title']] = 0
 				self.process['url'][url_type][loc['url_title']] += 1
 
 		# 话题
-		if item.has_key('topic_struct') and len(item['topic_struct']) > 0:
+		if 'topic_struct' in item and len(item['topic_struct']) > 0:
 			for top in item['topic_struct']:
 				t_title = top['topic_title']
-				if not self.process['topic'].has_key(t_title):
+				if t_title not in self.process['topic']:
 					self.process['topic'][t_title] = 0
 				self.process['topic'][t_title] += 1
 
 		self._one_wb_info(item)
-	# end _loop_item_v1
+	# end
 
 	def _one_wb_info(self, item):
 		# id、日期、时间、转发、评论、点赞、配图个数
@@ -117,7 +121,7 @@ class Weibo(Spider):
 		wb['g_imgs'] = len(item['pic_ids'])
 		wb['h_week'] = time.strftime("%w", time_obj)
 		self.wbs_info.append(wb)
-	# end _one_wb_info
+	# end
 
 	def _after_loop_file_v1(self):
 		root_path = self.config['dump_dir']
@@ -129,42 +133,45 @@ class Weibo(Spider):
 		output_v1(root_path, 'url.json', self.process['url'])
 		output_v1(root_path, 'topic.json', self.process['topic'])
 		output_v1(root_path, 'imgs.json', self.process['imgs'])
-		# for x in self.process['imgs']:
-		# 	self.download_img_v1(x['id_list'], x['time'])
-		print '\n\n\t\t done!!! \n\n'
-	# end _after_loop_file_v1
+	# end
 
-	def download_img_v1(self, pic_list, timestamp):
+	def download_img_v1(self, pic_list):
+		""" pic_list: [{
+				"url": "http://ww4.sinaimg.cn/large/7cba7d.jpg",
+				"time": 1449534237
+			}, {}]
 		"""
-		pic_list: ["图片id", "图片id"]
-		timestamp: "1470756132"
-		"""
-		uri = "http://ww2.sinaimg.cn/large/"
 		path = self.config['dump_dir'] + '/img/'
 		check_path(path)
-		time_array = time.localtime(timestamp)
-		created_at = time.strftime("%Y-%m-%d-%H.%M.%S", time_array)
 		for x in pic_list:
-			img_url = uri + str(x) + '.jpg'
-			img_name = created_at + '-' + str(x) + '.jpg'
-			print img_name
-			urllib.urlretrieve(img_url, path + img_name)
-	# end download_img_v1
+			time_array = time.localtime(x['time'])
+			created_at = time.strftime("%Y-%m-%d-%H.%M.%S", time_array)
+			img_name = path + created_at + '.jpg'
+			print x, img_name
+			jpgsize = 0
+			while (jpgsize == 0):
+				urllib.urlretrieve(x['url'], img_name)
+				jpgsize = os.path.getsize(img_name)
+			print jpgsize
+	# end
 
 	def data_clean(self):
 		# 去掉html标签，提取：@
 		# 表情统一处理：[]
 		# 标签不需要关注，已从结构化数据中提取
 		pass
+	# end
 
 # end class
 
 
 if __name__ == '__main__':
 	weibo = Weibo('config.ini')
-	weibo.get_data()
-	weibo.extract_v1()
-	imgs_list = init( weibo.config['dump_dir']  + '/imgs.json')
-	for x in imgs_list:
-			weibo.download_img_v1(x['id_list'], x['time'])
+	# weibo.get_data()
+	# weibo.extract_v1()
+	imgs_list = init(weibo.config['dump_dir']  + '/imgs.json')
+	print imgs_list
+	weibo.download_img_v1(imgs_list)
+	print '\n\n\t\t done!!! \n\n'
+
 
