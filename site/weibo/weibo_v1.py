@@ -90,12 +90,17 @@ class WeiboV1(Spider):
 	########################################
 
 	def get_total_weibo_wap(self):
-		# document.querySelector('input[name="mp"]').value
 		url = self.config['base_url']
 		header = self._get_header_v1()
-		response = self.simple_request_v1(url, header, self.get_params_weibo(1))
-
-		# return 6835
+		response = self.simple_request_v1(url, header, self.get_params_weibo_wap(1))
+		matchObj = re.search( r'name="mp".+?/>', response.text, re.M|re.I)
+		if matchObj:
+			page = re.sub(r'\D', '', matchObj.group())
+		else:
+			print "No match!!"
+			page = 0
+		print 'total page is ' + str(page)
+		return int(page)
 
 	def get_params_weibo_wap(self, page):
 		return {
@@ -112,3 +117,4 @@ class WeiboV1(Spider):
 if __name__ == '__main__':
 	weibov1 = WeiboV1('config-v1.ini')
 	weibov1.get_data_v1(worker=20)
+	# weibov1._get_total_page_v1()
