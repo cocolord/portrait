@@ -24,10 +24,10 @@ class Weibo(Spider):
 	# end
 
 	def _check_more(self, text):
-		if text.find('{"mod_type":"mod\/empty"') > 0:
-			return False
-		else:
+		if text.find('"mod_type":"mod\/pagelist"') > 0:
 			return True
+		else:
+			return False
 	# end
 
 	def download_img(self, pic_arr, timestamp):
@@ -155,6 +155,7 @@ class Weibo(Spider):
 					f = file(img_name, "wb")
 					f.write(data)
 					f.close()
+					print x['url'] + ' download completed!'
 					download = True
 				elif code == 403:
 					print "forbidden"
