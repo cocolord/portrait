@@ -53,6 +53,7 @@ class Weibo(Spider):
 		self.process['url'] = dict()
 		self.process['topic'] = dict()
 		self.process['imgs'] = list()
+		self.process['source'] = dict()
 		self.wbs_info = list()
 		self.content = ""
 	# end
@@ -102,6 +103,13 @@ class Weibo(Spider):
 					self.process['topic'][t_title] = 0
 				self.process['topic'][t_title] += 1
 
+		# 设备
+		if 'source' in item:
+			source = item['source']
+			if source not in self.process['source']:
+				self.process['source'][source] = 0
+			self.process['source'][source] += 1
+
 		self._one_wb_info(item)
 	# end
 
@@ -126,11 +134,12 @@ class Weibo(Spider):
 		wbs_info_txt = list_to_tab_str(self.wbs_info, "idstr\tdate\ttime\treposts"\
 			+ "\tcomments\tlike\timgs\tweek")
 		output_v1(root_path, 'wb_info.txt', wbs_info_txt)
-		output_v1(root_path, 'wb_info.json', self.wbs_info)
+		# output_v1(root_path, 'wb_info.json', self.wbs_info)
 		output_v1(root_path, 'content.txt', self.content)
 		output_v1(root_path, 'url.json', self.process['url'])
 		output_v1(root_path, 'topic.json', self.process['topic'])
 		output_v1(root_path, 'imgs.json', self.process['imgs'])
+		output_v1(root_path, 'source.json', self.process['source'])
 	# end
 
 	def download_img_v1(self, pic_list):
@@ -166,6 +175,11 @@ class Weibo(Spider):
 		# 去掉html标签，提取：@
 		# 表情统一处理：[]
 		# 标签不需要关注，已从结构化数据中提取
+		# re.sub(r'<+.+<\/.>', '', test)
+		#
+		# 转发
+		# 含有 retweeted_status
+		# re.sub(r'\/\/+.*', '', test1)
 		pass
 	# end
 
@@ -174,10 +188,10 @@ class Weibo(Spider):
 
 if __name__ == '__main__':
 	weibo = Weibo('config.ini')
-	weibo.get_data()
+	# weibo.get_data()
 	weibo.extract_v1()
-	imgs_list = init(weibo.config['dump_dir']  + '/imgs.json')
-	weibo.download_img_v1(imgs_list)
+	# imgs_list = init(weibo.config['dump_dir']  + '/imgs.json')
+	# weibo.download_img_v1(imgs_list)
 	print '\n\n\t\t done!!! \n\n'
 
 
