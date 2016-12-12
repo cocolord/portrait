@@ -5,10 +5,12 @@
 ```
 {
     "uid": 10001000,
-    "dump_dir": "weibo/data/",
-    "type": "weibo",
-    "base_url": "http://m.weibo.cn/page/json",
-    "cookie": ""
+    "cookie": "",
+
+    "dump_dir": "data",
+    "type": "weibo-wap",
+    "ua": "../../config/user-agent.json",
+    "base_url": "http://weibo.cn/drwujun",
 }
 ```
 
@@ -17,5 +19,7 @@ type 值及对应的 base_url
 | type | base_url |
 | ---- | -------- |
 | weibo | http://m.weibo.cn/page/json |
+| weibo-wap | http://weibo.cn/u/ |
+
 
 

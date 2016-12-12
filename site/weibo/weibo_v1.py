@@ -17,6 +17,8 @@ class WeiboV1(Spider):
 		print '\n in WeiboV1 __init__'
 		if self.config['type'] == "weibo":
 			self.before_get_all_weibo()
+		else:
+			self.before_get_wap_weibo()
 	# end
 
 	def _get_total_page_v1(self):
@@ -89,6 +91,10 @@ class WeiboV1(Spider):
 	#   	wap 版用户全部微博			   #
 	########################################
 
+	def before_get_wap_weibo(self):
+		self.config['base_url'] = self.config['wap_url'] + str(self.config['uid'])
+	# end
+
 	def get_total_weibo_wap(self):
 		url = self.config['base_url']
 		header = self._get_header_v1()
@@ -101,15 +107,18 @@ class WeiboV1(Spider):
 			page = 0
 		print 'total page is ' + str(page)
 		return int(page)
+	# end
 
 	def get_params_weibo_wap(self, page):
 		return {
 			'page': page
 		}
+	# end
 
 	def check_more_weibo_wap(self, text):
 		""" wap 版一开始就确定了总页数 """
 		return True
+	# end
 
 # end
 
