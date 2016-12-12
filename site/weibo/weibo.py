@@ -190,7 +190,13 @@ class Weibo(Spider):
 			+ 'uid=' + str(self.config['myid'])
 		headers = self._get_header_v1()
 		response = self.simple_request_v1(url, headers, '')
-		output_v1(self.config['dump_dir'], 'user_info.json', json.loads(response.text))
+		data = json.loads(response.text)
+		output_v1(self.config['dump_dir'], 'user_info.json', data)
+		content = ""
+		for item in data['cards'][0]['card_group']:
+			if item['item_content'] == '' : continue
+			content += item['item_name'] + ": " + item['item_content'] + "\n"
+		output_v1(self.config['dump_dir'], 'user_info.txt', content)
 	# end
 
 # end class

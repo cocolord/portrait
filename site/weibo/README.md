@@ -1,6 +1,6 @@
 # 微博
 
-微博是一个开放平台，不需要登录即可以查看其它用户的内容
+微博是一个开放平台，主要有电脑版、智能机版、低端机版，即www、m、wap，抓取的难度也是依次下降。
 
 [wap版文档](readme-wap.md)
 
@@ -12,16 +12,21 @@
 {
     "uid": 10000,
     "cookie": "",
+    "dump_dir": "data/",
     "base_url": "http://m.weibo.cn/page/json?containerid=100505",
-    "dump_dir": "data-m/data/guoqinya",
-    "ua": "../../config/user-agent.json"
+    "ua": "../../config/user-agent.json",
+
+    "myid": 88888,
+    "user_url": "http://m.weibo.cn/container/getIndex?containerid=230283"
 }
 ```
 
-- uid：需要抓取的微博账号的id
-- dump_dir：存储数据的路径
+- `uid`：需要抓取的微博账号的id
+- `dump_dir`：存储数据的路径
 
-如果抓取大量数据，超过2000条，则需要添加cookie字段
+如果抓取大量数据，超过2000条，则需要添加`cookie`字段
+
+如果需要抓取用户主页的个人信息，则需要填写`myid`字段
 
 ## 接口分析
 
@@ -85,6 +90,7 @@
 
 
 ## 没有更多内容
+
 ```
 {
     "ok": 1,
