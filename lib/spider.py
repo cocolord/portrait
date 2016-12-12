@@ -202,6 +202,7 @@ class Spider(object):
 			response = requests.post(url, data=params, headers=header)
 		else:
 			response = requests.get(url, params=params, headers=header)
+		print response.status_code
 		return response
 	# end
 

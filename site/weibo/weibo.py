@@ -183,15 +183,26 @@ class Weibo(Spider):
 		pass
 	# end
 
+	def get_user_info(self):
+		""" 获取用户个人主页信息 """
+		url = self.config['user_url'] + str(self.config['uid']) \
+			+ '_-_INFO&title=%25E5%259F%25BA%25E6%259C%25AC%25E4%25BF%25A1%25E6%2581%25AF&'\
+			+ 'uid=' + str(self.config['myid'])
+		headers = self._get_header_v1()
+		response = self.simple_request_v1(url, headers, '')
+		output_v1(self.config['dump_dir'], 'user_info.json', json.loads(response.text))
+	# end
+
 # end class
 
 
 if __name__ == '__main__':
 	weibo = Weibo('config.ini')
 	# weibo.get_data()
-	weibo.extract_v1()
+	# weibo.extract_v1()
 	# imgs_list = init(weibo.config['dump_dir']  + '/imgs.json')
 	# weibo.download_img_v1(imgs_list)
+	weibo.get_user_info()
 	print '\n\n\t\t done!!! \n\n'
 
 

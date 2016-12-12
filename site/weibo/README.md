@@ -2,7 +2,7 @@
 
 微博是一个开放平台，不需要登录即可以查看其它用户的内容
 
-[v1版文档](readme-v1.md)
+[wap版文档](readme-wap.md)
 
 ## config.ini
 
@@ -10,8 +10,11 @@
 
 ```
 {
-    "uid": 10001000,
-    "dump_dir": "weibo/data/"
+    "uid": 10000,
+    "cookie": "",
+    "base_url": "http://m.weibo.cn/page/json?containerid=100505",
+    "dump_dir": "data-m/data/guoqinya",
+    "ua": "../../config/user-agent.json"
 }
 ```
 
