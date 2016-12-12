@@ -143,11 +143,14 @@ class Spider(object):
 	def _get_header_v1(self):
 		""" 随机分配一个请求头，主要是 UA 和 Cookie """
 		key = int(math.floor(random.random()*33))
-		if not self.config.has_key('cookie'):
+		if 'cookie' not in self.config:
 			self.config['cookie'] = ""
+		if 'authorization' not in self.config:
+			self.config['authorization'] = ""
 		header = {
 			'User-Agent': self.config['ua'][key],
-			'Cookie': self.config['cookie']
+			'Cookie': self.config['cookie'],
+			'authorization': self.config['authorization']
 		}
 		return header
 	# end
@@ -197,7 +200,7 @@ class Spider(object):
 
 	def simple_request_v1(self, url, header, params):
 		""" 发送一个请求 """
-		print params
+		print 'simple_request_v1: ' + str(params)
 		if self.config.has_key('type') and self.config['type'] == 'post':
 			response = requests.post(url, data=params, headers=header)
 		else:
@@ -268,6 +271,53 @@ class Spider(object):
 		self._after_loop_file_v1()
 		# end for file
 	# end extract_v1
+
+##############################################################################
+##############################################################################
+##############################################################################
+
+	def get_data_v2(self):
+		""" 单线程获取数据，适用于无法获得总页数的例子 """
+		header = self._get_header_v1()
+
+		more = True
+		fail = forbidden = reset = error414 = 0
+		index = 1
+
+		while more:
+			print '\n no.' + str(index)
+			params = self._get_params_v1(index)
+			response = self.simple_request_v1(self.config['base_url'], header, params)
+			print '\t\t status: ' + str(response.status_code)
+			if response.status_code == 200:
+				util.output(self.config['requests_dir'], index, response.text)
+				more = self._check_more_v1(response.text)
+				print '\t\t\t has_more: ' + str(more)
+				if fail > 10 : break
+				if more is False:
+					fail += 1
+				else:
+					fail = forbidden = error414 = 0
+					index += 1
+			elif response.status_code == 403:
+				if reset > 10 : break
+				forbidden += 1
+				if forbidden > 10:
+					header = self._get_header_v1()
+					forbidden = 0
+					reset += 1
+			elif response.status_code == 414:
+				if error414 > 10 : break
+				error414 += 1
+			else:
+				if fail > 10 : break
+				util.output(self.config['dump_dir'], 'error', response.text)
+				fail += 1
+				print '\n\t\t something wrong, fail ' + str(fail) + '\n\n'
+			# end if-elif-else
+		# end while
+		print '\n\n\t\t done!!! \n\n'
+	# end get_data_v2
 
 # end Spider
 
