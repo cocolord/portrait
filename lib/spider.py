@@ -235,7 +235,7 @@ class Spider(object):
 		pass
 	# end _before_loop_file_v1
 
-	def _get_loop_data_v1(self, text):
+	def _get_loop_data_v1(self, read_data):
 		pass
 	# end _get_loop_data_v1
 
@@ -258,11 +258,11 @@ class Spider(object):
 		for file in files:
 			print '\n' + file + '\n'
 			f = open(self.config['requests_dir'] + '/' + file)
-			text = f.readlines()
+			read_data = f.readlines()
 			f.close()
 			del f
-			data = self._get_loop_data_v1(text)
-			del text
+			data = self._get_loop_data_v1(read_data)
+			del read_data
 			if len(data) < 1:
 				continue
 			for item in data:
