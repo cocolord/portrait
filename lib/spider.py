@@ -140,9 +140,12 @@ class Spider(object):
 		pass
 	# end
 
-	def _get_header_v1(self):
+	def _get_header_v1(self, index=""):
 		""" 随机分配一个请求头，主要是 UA 和 Cookie """
-		key = int(math.floor(random.random()*33))
+		if index == "":
+			key = int(math.floor(random.random()*33))
+		else:
+			key = index
 		if 'cookie' not in self.config:
 			self.config['cookie'] = ""
 		if 'authorization' not in self.config:
@@ -201,6 +204,18 @@ class Spider(object):
 	def simple_request_v1(self, url, header, params):
 		""" 发送一个请求 """
 		print 'simple_request_v1: ' + str(params)
+		if self.config.has_key('type') and self.config['type'] == 'post':
+			response = requests.post(url, data=params, headers=header)
+		else:
+			response = requests.get(url, params=params, headers=header)
+		return response
+	# end
+
+	def simple_request_with_header(self, url, params):
+		""" 简单的请求，自带header """
+		print 'simple_request_with_header: ' + str(params)
+		header = self._get_header_v1(0)
+		print header
 		if self.config.has_key('type') and self.config['type'] == 'post':
 			response = requests.post(url, data=params, headers=header)
 		else:
@@ -276,9 +291,11 @@ class Spider(object):
 ##############################################################################
 ##############################################################################
 
-	def get_data_v2(self):
+	def get_data_v2(self, url=""):
 		""" 单线程获取数据，适用于无法获得总页数的例子 """
 		header = self._get_header_v1()
+		if url == "":
+			url = self.config['base_url']
 
 		more = True
 		fail = forbidden = reset = error414 = 0
@@ -287,7 +304,7 @@ class Spider(object):
 		while more:
 			print '\n no.' + str(index)
 			params = self._get_params_v1(index)
-			response = self.simple_request_v1(self.config['base_url'], header, params)
+			response = self.simple_request_v1(url, header, params)
 			print '\t\t status: ' + str(response.status_code)
 			if response.status_code == 200:
 				util.output(self.config['requests_dir'], index, response.text)
