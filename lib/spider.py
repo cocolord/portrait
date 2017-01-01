@@ -269,7 +269,10 @@ class Spider(object):
 		files = util.get_dir_list(self.config['requests_dir'])
 		if len(files) < 1:
 			return
-		files.sort(key=lambda x:int(x[:-4]))
+		if files[0].endswith('.txt'):
+			files.sort(key=lambda x:int(x[:-4]))
+		elif files[0].endswith('.json'):
+			files.sort(key=lambda x:int(x[:-5]))
 		self._before_loop_file_v1()
 		for file in files:
 			print '\n' + file + '\n'

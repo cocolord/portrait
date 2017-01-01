@@ -35,7 +35,7 @@ def check_path(path):
 def output(path, name, text):
 	""" 输出 response 内容到文件 """
 	check_path(path)
-	file = str(path) + '/' + str(name) + '.txt'
+	file = str(path) + '/' + str(name) + '.json'
 	f = open(file, 'w')
 	f.write(text)
 	f.close()

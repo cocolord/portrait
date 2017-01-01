@@ -3,6 +3,7 @@
 
 # 数据文件
 data
+*data*
 
 # log文件
 log.txt
